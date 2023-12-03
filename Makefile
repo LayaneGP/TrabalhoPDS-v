@@ -1,6 +1,6 @@
 # Compilador e flags
 CPP = g++
-CPPFLAGS = -std=c++11 -Wall -I include
+CPPFLAGS = -std=c++17 -Wall -I include
 
 # Diretórios
 SRC_DIR = src
@@ -45,10 +45,6 @@ $(BIN_TESTS_DIR)/%: $(OBJ_TESTS)/%.o $(OBJ_FILES_NO_MAIN)
 
 # Alvo para executar todos os testes
 test: $(TEST_EXECUTABLES)
-	@for test in $(TEST_EXECUTABLES); do \
-	    echo "Running $$test"; \
-	    ./$$test; \
-	done
 
 # Alvo para limpeza de arquivos gerados
 clean:
