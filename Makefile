@@ -1,63 +1,53 @@
-####################################################
-#                      MAKEFILE                    #
-####################################################
+# Makefile para projeto C++
 
-##### DEFINES #####
-APPS = ./apps/tests
-DOCTEST = ./DOCTEST
-HEADERS = ./headers
-SRC = ./src
-TESTS = ./tests
-OBJ = ./obj
-CWI = ./Capybara
-FINAL_INCLUDES = ./CWI
+# Compilador e flags
+CC = g++
+CCFLAGS = -std=c++11 -Wall -I include
 
-LIBS = $(DOCTEST)/* -lCwI -L $(CWI)
+# Diretórios
+SRC_DIR = src
+OBJ_DIR = obj
+BIN_DIR = bin
+INCLUDE_DIR = include
+TEST_DIR = tests
 
-##### ALL #####
-all: headers apps atz_files
+# Arquivos fonte, objeto e cabeçalho
+SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp)
+OBJ_FILES := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC_FILES))
+HEADER_FILES := $(wildcard $(INCLUDE)/*.hpp)
+OBJ_NO_MAIN := $(filter-out obj/main.o, $(wildcard $(OBJ_DIR)/*.o))
 
-##### COMPILE HEADERS FILES #####
-headers:\
-	$(OBJ)/Div.o \
-	$(OBJ)/Element.o \
-	$(OBJ)/Style.o \
-	$(OBJ)/Text.o \
-	$(OBJ)/Image.o \
-	$(OBJ)/TextBox.o \
-	$(OBJ)/Button.o \
-	$(OBJ)/Form.o \
-	$(OBJ)/Render.o
-	ar -rcs $(CWI)/libCwI.a $(OBJ)/*.o
+# Nome do executável
+EXECUTABLE = $(BIN_DIR)/main
 
-##### COMPILE APPS #####
-apps:\
-	clean_tests \
-	$(APPS)/test_div \
-	$(APPS)/test_text \
-	$(APPS)/test_style \
-	$(APPS)/test_image \
-	$(APPS)/test_textbox \
-	$(APPS)/test_button \
-	$(APPS)/test_form \
-	$(APPS)/test_render
+# Alvo principal
+all: $(EXECUTABLE)
 
-atz_files:
-	rm -rf $(FINAL_INCLUDES)/*
-	cp $(HEADERS)/* $(FINAL_INCLUDES)
+# Alvo para objetos
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp $(HEADER_FILES)
+	$(CC) $(CCFLAGS) -c $^ -o $@
 
-##### GENERAL DIRECTIVE FOR COMPILE OBJ FILES #####
-$(OBJ)/%.o: $(SRC)/%.cpp $(HEADERS)/%.hpp
-	g++ -c $< -Wall -I $(HEADERS) -o $@
+# Alvo principal
+$(EXECUTABLE): $(OBJ_FILES)
+	$(CC) $(CCFLAGS) $^ -o $@
 
-##### GENERAL DIRECTIVE FOR COMPILE EXE FILES #####
-$(APPS)/%: $(TESTS)/%.cpp
-	g++ $< -Wall $(LIBS) -I $(HEADERS) -o $@
-
-##### CLEAN OLD VERSIONS #####
+# Alvo para limpeza de arquivos gerados
 clean:
-	rm -rf $(APPS)/* $(CWI)/* $(OBJ)/*
+	del /Q $(OBJ_DIR)\*.o
+	del /Q $(BIN_DIR)\*
+	del /Q $(TEST_DIR)\*.o
+	del /Q $(TEST_DIR)\*.exe
 
-##### CLEAN ALL APPS FOR NEW COMPILE #####
-clean_tests:
-	rm -rf $(APPS)/*
+run: 
+	./bin/main
+
+test:
+# g++ tests/test_posts.cpp tests/doctest.hpp -I include $(OBJ_NO_MAIN) -o tests/test_post.exe
+	$(CC) $(CCFLAGS) -c tests/test_posts.cpp -o obj/test_posts.o
+	$(CC) $(CCFLAGS) tests/doctest.hpp $(OBJ_NO_MAIN) -o tests/test_posts.exe
+
+post: $(OBJ_FILES)
+	$(CC) $(CCFLAGS) $^ -o tests/test_posts
+
+test-post:
+	./tests/test_posts
