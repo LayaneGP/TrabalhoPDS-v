@@ -48,12 +48,11 @@ test: $(TEST_EXECUTABLES)
 
 # Alvo para limpeza de arquivos gerados
 clean:
-	@if not exist $(OBJ_DIR) mkdir $(OBJ_DIR)
-	@if not exist $(OBJ_TESTS) mkdir $(OBJ_TESTS)
-	del /Q $(OBJ_DIR)\*.o
-	del /Q $(OBJ_TESTS)\*.o
-	del /Q $(BIN_DIR)\*
-	del /Q $(BIN_TESTS_DIR)\*
+	@mkdir -p $(OBJ_DIR) $(OBJ_TESTS) $(BIN_TESTS_DIR)
+	$(RM) $(OBJ_DIR)/*.o
+	$(RM) $(OBJ_TESTS)/*.o
+	$(RM) $(BIN_DIR)/*
+	$(RM) $(BIN_TESTS_DIR)/*
 
 # Faz com que os alvos "test" e "clean" não sejam confundidos com arquivos
 .PHONY: all test clean
