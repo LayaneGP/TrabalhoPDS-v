@@ -1,5 +1,5 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-#include "doctest.hpp"
+#include "../include/doctest.hpp"
 #include "../include/user.hpp"
 
 TEST_CASE("Is it an email?") {

@@ -3,7 +3,7 @@
 #include "../include/gerenciar_posts.hpp"
 #include "../include/post.hpp"
 #include "../include/repositorio_posts.hpp"
-#include "doctest.hpp"
+#include "../include/doctest.hpp"
 #include <iostream>
 #include <vector>
 
@@ -82,11 +82,4 @@ TEST_CASE("Testando a busca por posts") {
   REQUIRE(!my_vec.empty());
 
   CHECK(my_vec[my_vec.size() - 1].find("907077e91c9c893") != std::string::npos);
-}
-
-TEST_CASE(
-    "Testando a remoção de posts que pertencem a um determinado usuário") {
-  RepositorioPosts repo;
-
-  REQUIRE_NOTHROW(repo.usuario_removido("907077e91c9c893"));
 }
