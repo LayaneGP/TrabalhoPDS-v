@@ -1,75 +1,157 @@
-# Compilador e flags
-CPP = g++
-CPPFLAGS = -std=c++17 -Wall -I include
+## # CC and flags
+## CC = g++
+## CXXFLAGS = -std=c++11 -g -Wall
+## 
+## # folders
+## INCLUDE_FOLDER = ./include/
+## BIN_FOLDER = ./bin/
+## OBJ_FOLDER = ./obj/
+## SRC_FOLDER = ./src/
+## 
+## 
+## # all sources, objs, and header files
+## MAIN = main
+## TARGET = main.exe
+## SRC = $(wildcard $(SRC_FOLDER)*.cpp)
+## OBJ = $(patsubst $(SRC_FOLDER)%.cpp, $(OBJ_FOLDER)%.o, $(SRC))
+## 
+## # compile
+## $(OBJ_FOLDER)%.o: $(SRC_FOLDER)%.cpp
+## 	$(CC) $(CXXFLAGS) -c $< -o $@ -I$(INCLUDE_FOLDER)
+## 
+## all: $(OBJ)
+## 	$(CC) $(CXXFLAGS) -o $(BIN_FOLDER)$(TARGET) $(OBJ) 
+## 
+## clean:
+## 	@rm -rf $(OBJ_FOLDER)* $(BIN_FOLDER)*
+## 
+## run:
+## 	@$(BIN_FOLDER)$(TARGET)
+
+
+# Makefile para compilar e executar um programa C++ com testes
+
+# Compiler
+CXX := g++
+# Flags para o compilador
+CXXFLAGS := -std=c++17 -Wall -Wextra -Iinclude
 
 # Diretórios
-SRC_DIR = src
-OBJ_DIR = obj
-OBJ_TESTS = obj_tests
-BIN_DIR = bin
-BIN_TESTS_DIR = bin_tests
-TESTS_DIR = tests
+BIN_DIR := bin
+BIN_TESTS_DIR := bin_tests
+OBJ_DIR := obj
+INCLUDE_DIR := include
+SRC_DIR := src
+TEST_DIR := tests
+OBJ_TEST_DIR := obj_tests
 
-# Arquivos fonte, objeto e cabeçalho
-SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp)
-OBJ_FILES := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC_FILES))
-OBJ_FILES_NO_MAIN := $(filter-out $(OBJ_DIR)/main.o,$(OBJ_FILES))
-HEADER_FILES := $(wildcard $(SRC_DIR)/*.hpp)
+# Arquivos fonte
+SRCS := $(wildcard $(SRC_DIR)/*.cpp)
+OBJS := $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRCS))
+OBJS_TEST := $(patsubst $(TEST_DIR)/%.cpp, $(OBJ_TEST_DIR)/%.o, $(SRCS))
+
+
+TEST_SRCS := $(wildcard $(TEST_DIR)/*.cpp)
+TEST_OBJS := $(patsubst $(TEST_DIR)/%.cpp, $(OBJ_TEST_DIR)/%.o, $(TEST_SRCS))
 
 # Nome do executável
-EXECUTABLE = $(BIN_DIR)/main
+TARGET := $(BIN_DIR)/main.exe
 
-# Lista de arquivos de teste
-TEST_FILES := $(wildcard $(TESTS_DIR)/*.cpp)
-TEST_OBJ_FILES := $(patsubst $(TESTS_DIR)/%.cpp,$(OBJ_TESTS)/%.o,$(TEST_FILES))
-TEST_EXECUTABLES := $(patsubst $(TESTS_DIR)/%.cpp,$(BIN_TESTS_DIR)/%,$(TEST_FILES))
+# Nome do executável de testes
+TEST_TARGET := $(BIN_TESTS_DIR)/test_my_program
 
-# Alvo principal
-all: $(EXECUTABLE)
+# Regras de compilação
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-# Alvo para objetos
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp $(HEADER_FILES)
-	$(CPP) $(CPPFLAGS) -c $< -o $@
+$(OBJ_TEST_DIR)/%.o: $(TEST_DIR)/%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-# Alvo para objetos de teste
-$(OBJ_TESTS)/%.o: $(TESTS_DIR)/%.cpp $(HEADER_FILES) | $(OBJ_TESTS)
-	$(CPP) $(CPPFLAGS) -c $< -o $@
+# Regras principais
+build: $(TARGET) $(TEST_TARGET)
 
-# Alvo principal
-$(EXECUTABLE): $(OBJ_FILES)
-	$(CPP) $(CPPFLAGS) $^ -o $@
+test: $(TEST_TARGET)
+	@./$(TEST_TARGET)
 
-# Alvo para cada teste
-$(BIN_TESTS_DIR)/%: $(OBJ_TESTS)/%.o $(OBJ_FILES_NO_MAIN)
-	$(CPP) $(CPPFLAGS) $^ -o $@
+run: $(TARGET)
+	@./$(TARGET)
 
-# Alvo para executar todos os testes
-test: $(TEST_EXECUTABLES)
+$(TARGET): $(OBJS)
+	$(CXX) $(CXXFLAGS) $^ -o $@
 
-# Alvo para limpeza de arquivos gerados
+$(TEST_TARGET): $(TEST_OBJS) $(filter-out $(OBJ_DIR)/main.o, $(OBJS))
+	$(CXX) $(CXXFLAGS) $^ -o $@
+
+# Limpar arquivos intermediários e executáveis
 clean:
-	@if not exist $(OBJ_DIR) mkdir $(OBJ_DIR)
-	@if not exist $(OBJ_TESTS) mkdir $(OBJ_TESTS)
-	@if not exist $(BIN_TESTS_DIR) mkdir $(BIN_TESTS_DIR)
-	del $(OBJ_DIR)\*.o
-	del $(OBJ_TESTS)\*.o
-	del $(BIN_DIR)\*
-	del $(BIN_TESTS_DIR)\*
+	@rm -rf $(OBJ_DIR)/* $(BIN_DIR)/* $(BIN_TESTS_DIR)/* $(OBJ_TEST_DIR)/*
 
-# Faz com que os alvos "test" e "clean" não sejam confundidos com arquivos
-.PHONY: all test clean
+# Fazer clean e build
+rebuild: clean build
 
-run: 
-	./bin/main
+.PHONY: build test run clean rebuild
 
-run-post:
-	./bin_tests/test_posts.exe
 
-run-rep-usu:
-	./bin_tests/test_repositorio_usuarios.exe
 
-run-monitor:
-	./bin_tests/test_user_monitor.exe
+##############################################
 
-run-user:
-	./bin_tests/test_user.exe
+
+# Makefile para compilar e executar um programa C++ com testes
+
+# Compiler
+CXX := g++
+# Flags para o compilador
+CXXFLAGS := -std=c++17 -Wall -Wextra -I$(INCLUDE_DIR)
+
+# Diretórios
+BIN_DIR := bin
+BIN_TESTS_DIR := bin_tests
+OBJ_DIR := obj
+OBJ_TEST_DIR := obj_tests
+INCLUDE_DIR := include
+SRC_DIR := src
+TEST_DIR := tests
+
+# Arquivos fonte
+SRCS := $(wildcard $(SRC_DIR)/*.cpp)
+OBJS := $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRCS))
+
+TEST_SRCS := $(wildcard $(TEST_DIR)/*.cpp)
+TEST_OBJS := $(patsubst $(TEST_DIR)/%.cpp, $(OBJ_TEST_DIR)/%.o, $(TEST_SRCS))
+
+# Nome do executável
+TARGET := $(BIN_DIR)/main.exe
+
+# Nome do executável de testes
+TEST_TARGET := $(BIN_TESTS_DIR)/test_my_program
+
+# Regras de compilação
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+$(OBJ_TEST_DIR)/%.o: $(TEST_DIR)/%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+# Regras principais
+build: $(TARGET) $(TEST_TARGET)
+
+test: $(TEST_TARGET)
+	@./$(TEST_TARGET)
+
+run: $(TARGET)
+	@./$(TARGET)
+
+$(TARGET): $(OBJS)
+	$(CXX) $(CXXFLAGS) $^ -o $@
+
+$(TEST_TARGET): $(TEST_OBJS) $(filter-out $(OBJ_DIR)/main.o, $(OBJS))
+	$(CXX) $(CXXFLAGS) $^ -o $@
+
+# Limpar arquivos intermediários e executáveis
+clean:
+	@rm -rf $(OBJ_DIR)/* $(BIN_DIR)/* $(BIN_TESTS_DIR)/* $(OBJ_TEST_DIR)/*
+
+# Fazer clean e build
+rebuild: clean build
+
+.PHONY: build test run clean rebuild
